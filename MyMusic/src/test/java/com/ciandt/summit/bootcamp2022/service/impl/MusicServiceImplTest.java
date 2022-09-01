@@ -7,17 +7,16 @@ import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.repository.MusicRepository;
 import com.ciandt.summit.bootcamp2022.service.mapper.ArtistDTOMapper;
 import com.ciandt.summit.bootcamp2022.service.mapper.MusicDTOMapper;
-import com.ciandt.summit.bootcamp2022.service.mapper.MusicDTOMapperImpl;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
@@ -25,8 +24,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration
 class MusicServiceImplTest {
 
     @InjectMocks
@@ -35,11 +38,8 @@ class MusicServiceImplTest {
     @Mock
     private MusicRepository musicRepository;
 
-    private MusicDTOMapper musicDTOMapper = MusicDTOMapperImpl.INSTANCE;
-
-    //@Spy
-    //private MusicDTOMapper musicDTOMapper = Mappers.getMapper(MusicDTOMapper.class);
-
+    @InjectMocks
+    private MusicDTOMapper INSTANCE = MusicDTOMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {
@@ -47,10 +47,12 @@ class MusicServiceImplTest {
         musicService = new MusicServiceImpl(musicRepository);
     }
 
-    public void init() {
-        musicDTOMapper = Mappers.getMapper(MusicDTOMapper.class);
+    @BeforeEach
+    public void mapStructSetup() {
+        INSTANCE = Mappers.getMapper(MusicDTOMapper.class);
         ArtistDTOMapper artistDTOMapper = Mappers.getMapper(ArtistDTOMapper.class);
-        ReflectionTestUtils.setField(musicDTOMapper, "musicDTOMapper", artistDTOMapper);
+        ReflectionTestUtils.setField(INSTANCE, "artistDTOMapper", artistDTOMapper);
+        musicService.setMusicDTOMapper(INSTANCE);
     }
 
     public Set<Music> buildMusicSet() {
@@ -89,18 +91,16 @@ class MusicServiceImplTest {
     void findAllWithFilter() {
         String filter = "public";
 
-        Sort sort = Sort.by("artist.name").ascending()
-                .and(Sort.by("name").ascending());
+        Sort sort = Sort.by(any(), any()).ascending()
+                .and(Sort.by(any(), any()).ascending());
 
         Set<Music> music = buildMusicSet();
 
         when(musicRepository.findAllWithFilter(filter, sort)).thenReturn(music);
 
-        musicService.setMusicDTOMapper(musicDTOMapper);
-
         Set<MusicDTO> setAtual = musicService.findAllWithFilter(filter);
 
-        Set<MusicDTO> setEsperado = musicDTOMapper.toSetOfDTO(music);
+        Set<MusicDTO> setEsperado = INSTANCE.toSetOfDTO(music);
 
         assertEquals(setEsperado, setAtual);
     }
