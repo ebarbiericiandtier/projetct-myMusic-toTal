@@ -7,6 +7,8 @@ import com.ciandt.summit.bootcamp2022.exception.MusicNotFound;
 import com.ciandt.summit.bootcamp2022.service.MusicService;
 import com.ciandt.summit.bootcamp2022.service.mapper.MusicDTOMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +19,9 @@ import java.util.Set;
 public class MusicServiceImpl implements MusicService {
 
     private final MusicRepository musicRepository;
-    private final MusicDTOMapper musicDTOMapper;
+    @Autowired
+    @Setter
+    private MusicDTOMapper musicDTOMapper;
 
     public Set<MusicDTO> findAllWithFilter(String filter) {
 
