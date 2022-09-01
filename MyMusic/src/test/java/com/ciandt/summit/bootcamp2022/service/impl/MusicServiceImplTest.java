@@ -84,6 +84,7 @@ class MusicServiceImplTest {
     }
 
     public Set<MusicDTO> buildMusicSetDto() {
+
         Set<MusicDTO> set = new HashSet();
         ArtistDTO artist = new ArtistDTO();
         artist.setId(new UUID(3, 10));
