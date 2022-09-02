@@ -1,6 +1,7 @@
 package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.entity.Music;
+import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
 import com.ciandt.summit.bootcamp2022.repository.MusicRepository;
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.exception.MusicNotFound;
@@ -40,7 +41,7 @@ public class MusicServiceImpl implements MusicService {
     public Music findById(String id) {
         return musicRepository
                 .findById(id)
-                .orElseThrow(MusicNotFound::new);
+                .orElseThrow(InvalidMusicException::new);
     }
 
 }
