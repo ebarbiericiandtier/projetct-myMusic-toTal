@@ -10,6 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class ArtistDTO {
-    private UUID id;
+    private String id;
     private String name;
 }

@@ -36,4 +36,11 @@ public class MusicServiceImpl implements MusicService {
        return musicDTOMapper.toSetOfDTO(musicSet);
     }
 
+    @Override
+    public Music findById(String id) {
+        return musicRepository
+                .findById(id)
+                .orElseThrow(MusicNotFound::new);
+    }
+
 }
