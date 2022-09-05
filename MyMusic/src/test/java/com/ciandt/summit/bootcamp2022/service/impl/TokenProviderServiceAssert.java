@@ -1,7 +1,6 @@
-package com.ciandt.summit.bootcamp2022.test.services;
+package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.service.TokenProviderService;
-import com.ciandt.summit.bootcamp2022.service.impl.TokenProviderServiceImpl;
 import org.assertj.core.api.AbstractAssert;
 
 public class TokenProviderServiceAssert extends AbstractAssert<TokenProviderServiceAssert,TokenProviderService> {
