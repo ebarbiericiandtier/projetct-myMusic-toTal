@@ -1,6 +1,5 @@
 package com.ciandt.summit.bootcamp2022.service.impl;
 
-import com.ciandt.summit.bootcamp2022.dto.ArtistDTO;
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.entity.Artist;
 import com.ciandt.summit.bootcamp2022.entity.Music;
@@ -10,13 +9,11 @@ import com.ciandt.summit.bootcamp2022.service.mapper.ArtistDTOMapper;
 import com.ciandt.summit.bootcamp2022.service.mapper.MusicDTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
@@ -24,16 +21,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration
-class MusicServiceImplTest {
+public class MusicServiceImplTest {
 
     @InjectMocks
     private MusicServiceImpl musicService;
@@ -48,64 +45,25 @@ class MusicServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         musicService = new MusicServiceImpl(musicRepository);
-
+        mapStructSetup();
     }
 
-    @BeforeEach
     public void mapStructSetup() {
-        INSTANCE = Mappers.getMapper(MusicDTOMapper.class);
         ArtistDTOMapper artistDTOMapper = Mappers.getMapper(ArtistDTOMapper.class);
         ReflectionTestUtils.setField(INSTANCE, "artistDTOMapper", artistDTOMapper);
-    }
-
-
-    public Set<Music> buildEntitySet(String artistName, String musicName) {
-        Set<Music> set = new HashSet<>();
-        Artist artist = new Artist();
-        artist.setId(UUID.nameUUIDFromBytes(artistName.getBytes()).toString());
-        artist.setName(artistName);
-
-        Music music = buildMusicEntity(musicName, artist);
-        set.add(music);
-
-        return set;
-    }
-
-    private Music buildMusicEntity(String name, Artist a){
-        Music m = new Music();
-        m.setName(name);
-        m.setId(UUID.nameUUIDFromBytes(name.getBytes()).toString());
-        m.setArtist(a);
-        return m;
-    }
-
-    public Set<MusicDTO> buildMusicSetDto() {
-
-        Set<MusicDTO> set = new HashSet<>();
-        ArtistDTO artist = new ArtistDTO();
-        artist.setId(new UUID(3, 10).toString());
-        artist.setName("Engenheiros");
-        MusicDTO music = new MusicDTO();
-        music.setId(new UUID(3, 10).toString());
-        music.setName("Era Um Garoto Que Como Eu Amava Os Beatles");
-        music.setArtist(artist);
-
-        set.add(music);
-        return set;
-
+        musicService.setMusicDTOMapper(INSTANCE);
     }
 
     @Test
     void findAllWithFilter() {
-        String filter = "public";
-        musicService.setMusicDTOMapper(INSTANCE);
+        final Set<Music> music = new HashSet<>();
+        final String filter = "sucesso";
 
-        Set<Music> music = new HashSet<>();
         music.addAll(buildEntitySet("Paralamas", "do Sucesso"));
         music.addAll(buildEntitySet("Anitta", "com Sucesso"));
 
-        when(musicRepository.findAllWithFilter(anyString(), any())).thenReturn(music);
-
+        given(musicRepository.findAllWithFilter(anyString(), any()))
+                .willReturn(music);
 
         Set<MusicDTO> setAtual = musicService.findAllWithFilter(filter);
 
@@ -117,18 +75,36 @@ class MusicServiceImplTest {
 
     @Test
     void whenNotFindAllWithFilterByName() {
-        musicService.setMusicDTOMapper(INSTANCE);
 
-        when(musicRepository.findAllWithFilter(anyString(), any())).thenReturn(Collections.emptySet());
+        given(musicRepository.findAllWithFilter(anyString(), any()))
+                .willReturn(Collections.emptySet());
 
         MusicNotFound thrown = assertThrows(
                 MusicNotFound.class,
-                () -> musicService.findAllWithFilter("Sucesso"),
+                () -> musicService.findAllWithFilter("ada"),
                 "Exception not found"
         );
 
         assertEquals(thrown.getClass(), MusicNotFound.class);
     }
 
+    private Music buildMusicEntity(String name, Artist a){
+        Music m = new Music();
+        m.setName(name);
+        m.setId(UUID.nameUUIDFromBytes(name.getBytes()).toString());
+        m.setArtist(a);
+        return m;
+    }
 
+    public Set<Music> buildEntitySet(String artistName, String musicName) {
+        Set<Music> set = new HashSet();
+        Artist artist = new Artist();
+        artist.setId(UUID.nameUUIDFromBytes(artistName.getBytes()).toString());
+        artist.setName(artistName);
+
+        Music music = buildMusicEntity(musicName, artist);
+        set.add(music);
+
+        return set;
+    }
 }
