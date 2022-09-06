@@ -17,6 +17,11 @@
            statistics="true">
     </cache>
 
+    <cache name="Playlist" maxEntriesLocalHeap="10000" eternal="false"
+           timeToIdleSeconds="60" timeToLiveSeconds="60" memoryStoreEvictionPolicy="LRU"
+           statistics="true">
+    </cache>
+
     <cache name="User" maxEntriesLocalHeap="10000" eternal="false"
            timeToIdleSeconds="60" timeToLiveSeconds="60" memoryStoreEvictionPolicy="LRU"
            statistics="true">

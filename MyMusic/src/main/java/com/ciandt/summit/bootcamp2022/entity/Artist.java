@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "Artistas")
@@ -17,7 +18,7 @@ import javax.persistence.Table;
 @Setter
 @Cacheable
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE )
-public class Artist implements Serializable{
+public class Artist implements Serializable {
 
     @Id
     private String id;
