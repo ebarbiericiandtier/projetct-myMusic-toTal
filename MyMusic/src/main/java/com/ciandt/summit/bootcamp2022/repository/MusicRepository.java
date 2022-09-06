@@ -1,6 +1,7 @@
 package com.ciandt.summit.bootcamp2022.repository;
 
 import com.ciandt.summit.bootcamp2022.entity.Music;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 public interface MusicRepository extends JpaRepository<Music, String> {
 
+    @Cacheable(value = "Music")
     @Query(value = "SELECT msc FROM Music msc " +
             "   JOIN FETCH msc.artist art " +
             "   WHERE :name IS NULL" +
