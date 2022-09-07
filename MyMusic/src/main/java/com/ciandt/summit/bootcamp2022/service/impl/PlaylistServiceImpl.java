@@ -35,6 +35,14 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Transactional
     public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
 
+        Music music = musicService.findById(musicDTO.getId());
+
+        Playlist playlist = playlistRepository.findById(id)
+                .orElseThrow(PlaylistNotFoundException::new);
+
+        playlist.getMusics().add(music);
+        return playlistRepository.save(playlist);
+
     }
 
     @Transactional

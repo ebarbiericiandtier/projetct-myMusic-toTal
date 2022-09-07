@@ -51,7 +51,7 @@ public class PlaylistController {
             @ApiResponse(responseCode = "200", description = "Returns a playlist with updated songs",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlaylistDTO.class))}),
-            @ApiResponse(responseCode = "400", description = "Invalid parameter for music or playlist's ID", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid parameter for music or playlist", content = @Content)
     })
     @DeleteMapping("/{playlistId}/musicas")
     ResponseEntity<PlaylistDTO> removeMusicFromPlaylist(
