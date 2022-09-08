@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.Optional;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -33,5 +34,12 @@ public class Playlist implements Serializable {
             joinColumns = @JoinColumn(name = "PlaylistId"),
             inverseJoinColumns = @JoinColumn(name = "MusicaId"))
     private Set<Music> musics;
+
+
+    public Optional<Music> getMusicById(String idMusic){
+        return musics.stream()
+                .filter(music -> music.getId().equals(idMusic))
+                .findFirst();
+    }
 
 }
