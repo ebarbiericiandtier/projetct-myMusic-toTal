@@ -1,6 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: token-provider
+spec:
+  selector:
+    matchLabels:
+      app: token-provider
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: token-provider
+    spec:
+      containers:
+        - name: token-provider
+          image: jfrhudson/token-provider:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: my-music
 spec:
   selector:
@@ -16,6 +37,9 @@ spec:
         - name: my-music
           image: jfrhudson/my-music:1.0
           imagePullPolicy: Always
+          env:
+            - name: TOKEN_PROVIDER_URL
+              value: http://token-provider/
           ports:
             - containerPort: 8080
 ---
