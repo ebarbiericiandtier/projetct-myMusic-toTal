@@ -84,3 +84,24 @@ jobs:
           tags: jfrhudson/my-music:1.0
           cache-from: type=registry,ref=jfrhudson/my-music:buildcache
           cache-to: type=registry,ref=jfrhudson/my-music:buildcache,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ publish ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: okteto/login@master
+        with:
+          token: 'mOFl2fI3dly2UqX9XSFLC8NvvrMrhY7W3zuu5vk0kZUD3kyV'
+
+      - name: "Activate personal namespace"
+        uses: okteto/namespace@master
+        with:
+          name: jeffrhudson
+
+      - name: "Create deployment"
+        uses: okteto/apply@master
+        with:
+          manifest: k8s.yml
