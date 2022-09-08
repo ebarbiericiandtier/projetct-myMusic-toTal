@@ -2,6 +2,9 @@ package com.ciandt.summit.bootcamp2022.repository;
 
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +21,6 @@ public interface MusicRepository extends JpaRepository<Music, String> {
             "   OR UPPER(msc.name) LIKE UPPER('%'||:name||'%') " +
             "   OR UPPER(msc.artist.name) LIKE UPPER('%'||:name||'%') "
     )
-    Set<Music> findAllWithFilter(@Param("name") String name, Sort sort);
+    Slice<Music> findAllWithFilter(@Param("name") String name, Pageable p);
 
 }
