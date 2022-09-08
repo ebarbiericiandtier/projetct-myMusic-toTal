@@ -78,8 +78,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./MyMusic
-          file: ./Dockerfile
+          context: MyMusic
+          file: MyMusic/Dockerfile
           push: true
           tags: jfrhudson/my-music:1.0
           cache-from: type=registry,ref=jfrhudson/my-music:buildcache
