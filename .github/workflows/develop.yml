@@ -99,7 +99,7 @@ jobs:
       - name: "Activate personal namespace"
         uses: okteto/namespace@latest
         with:
-          name: jeffrhudson
+          namespace: jeffrhudson
 
       - name: "Create deployment"
         uses: okteto/apply@latest
