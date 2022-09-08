@@ -92,16 +92,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: okteto/login@master
+      - uses: okteto/login@latest
         with:
           token: 'mOFl2fI3dly2UqX9XSFLC8NvvrMrhY7W3zuu5vk0kZUD3kyV'
 
       - name: "Activate personal namespace"
-        uses: okteto/namespace@master
+        uses: okteto/namespace@latest
         with:
           name: jeffrhudson
 
       - name: "Create deployment"
-        uses: okteto/apply@master
+        uses: okteto/apply@latest
         with:
           manifest: k8s.yml
