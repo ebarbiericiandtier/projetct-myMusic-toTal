@@ -94,12 +94,12 @@ jobs:
 
       - uses: okteto/login@latest
         with:
-          token: 'mOFl2fI3dly2UqX9XSFLC8NvvrMrhY7W3zuu5vk0kZUD3kyV'
+          token: 't0dsHPUSTeCTnpt6QY43kQZJ5VKf88GqIUlNabq2XZgqX700'
 
       - name: "Activate personal namespace"
         uses: okteto/namespace@latest
         with:
-          namespace: jeffrhudson
+          namespace: jefferson023
 
       - name: "Create deployment"
         uses: okteto/apply@latest
