@@ -94,7 +94,7 @@ jobs:
 
       - uses: okteto/login@latest
         with:
-          token: 't0dsHPUSTeCTnpt6QY43kQZJ5VKf88GqIUlNabq2XZgqX700'
+          token: 'OJgUEvz7qRt9e6Jb2WVq46RQ1Pio8KvLkB2sz78dCX3nWPdK'
 
       - name: "Activate personal namespace"
         uses: okteto/namespace@latest
