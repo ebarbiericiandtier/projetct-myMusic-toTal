@@ -2,9 +2,9 @@ name: develop pipeline
 
 on:
   push:
-    branches: [ "BOOT-1216" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "BOOT-1216" ]
+    branches: [ "develop" ]
 
 jobs:
   test:
