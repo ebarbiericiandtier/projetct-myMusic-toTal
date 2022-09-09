@@ -11,6 +11,8 @@ import com.ciandt.summit.bootcamp2022.service.PlaylistService;
 import com.ciandt.summit.bootcamp2022.service.mapper.PlaylistDTOMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class PlaylistServiceImpl implements PlaylistService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PlaylistServiceImpl.class);
+
     private final PlaylistRepository playlistRepository;
     private final MusicService musicService;
     @Autowired
@@ -28,8 +32,12 @@ public class PlaylistServiceImpl implements PlaylistService {
     private PlaylistDTOMapper playlistDTOMapper;
 
     public Playlist findById(String id){
+
         return playlistRepository.findById(id)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> {
+                    logger.error("Invalid playlist id");
+                    return new NoSuchElementException();
+                });
     }
 
     @Transactional
@@ -38,8 +46,12 @@ public class PlaylistServiceImpl implements PlaylistService {
         Music music = musicService.findById(musicDTO.getId());
 
         Playlist playlist = playlistRepository.findById(id)
-                .orElseThrow(PlaylistNotFoundException::new);
+                .orElseThrow(() -> {
+                    logger.error("Playlist was not found");
+                    return new PlaylistNotFoundException();
+                });
 
+        logger.info("Music added to playlist successfully");
         playlist.getMusics().add(music);
         return playlistRepository.save(playlist);
 
@@ -52,8 +64,12 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .orElseThrow(PlaylistNotFoundException::new);
 
         final Music musicInPlaylist = playlistFound.getMusicById(musicDTO.getId())
-                .orElseThrow(InvalidMusicException::new);
+                .orElseThrow(() -> {
+                    logger.error("Invalid music id");
+                    return new InvalidMusicException();
+                });
 
+        logger.info("Music removed to playlist successfully");
         playlistFound.getMusics().remove(musicInPlaylist);
         return playlistRepository.save(playlistFound);
     }
