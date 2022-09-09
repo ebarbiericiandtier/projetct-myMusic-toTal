@@ -56,7 +56,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: TOKEN_PROVIDER_URL
-              value: http://token-provider:8080/
+              value: http://token-provider:8081/
           ports:
             - containerPort: 8080
 ---
