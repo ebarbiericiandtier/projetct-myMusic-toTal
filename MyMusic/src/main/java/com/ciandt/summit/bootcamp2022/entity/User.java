@@ -13,6 +13,8 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
@@ -32,6 +34,10 @@ public class User implements UserDetails, Serializable {
     private UUID id;
     @Column(name = "nome")
     private String username;
+
+    @OneToOne
+    @JoinColumn(name = "PlaylistId")
+    private Playlist playlist;
 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @Override
