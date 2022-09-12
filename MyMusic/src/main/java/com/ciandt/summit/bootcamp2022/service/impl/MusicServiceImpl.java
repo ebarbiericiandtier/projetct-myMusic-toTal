@@ -36,26 +36,23 @@ public class MusicServiceImpl implements MusicService {
     @Setter
     private MusicDTOMapper musicDTOMapper;
 
-    public Slice<Music> findAllWithFilter(String filter, Integer page, Integer size) {
+    public Slice<Music> findAllWithFilter(String filter, int page, int size) {
 
         Sort sort = Sort.by("artist.name").ascending()
                 .and(Sort.by("name").ascending());
 
-        Pageable pageable = PageRequest.of(
-                Optional.ofNullable(page).orElse(1),
-                Optional.ofNullable(size).orElse(10),
-                sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Slice<Music> musicSet = musicRepository.findAllWithFilter(filter, pageable);
 
         if (musicSet.isEmpty()) {
             logger.info("Music not found");
             throw new MusicNotFound();
+        }
 
 //       return musicDTOMapper.toSetOfDTO(musicSet);
-        return musicSet;
         logger.info("Musics returned successfully");
-        return musicDTOMapper.toSetOfDTO(musicSet);
+        return musicSet;
     }
 
     @Override
@@ -63,9 +60,9 @@ public class MusicServiceImpl implements MusicService {
         return musicRepository
                 .findById(id)
                 .orElseThrow(() -> {
-            logger.error("Invalid music id");
-            return new InvalidMusicException();
-        });
+                    logger.error("Invalid music id");
+                    return new InvalidMusicException();
+                });
     }
 
 }

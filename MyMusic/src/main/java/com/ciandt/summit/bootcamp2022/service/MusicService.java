@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface MusicService {
 
-   Slice<Music> findAllWithFilter(String filter, Integer page, Integer size);
+   Slice<Music> findAllWithFilter(String filter, int page, int size);
 
     Music findById(String id);
 }
