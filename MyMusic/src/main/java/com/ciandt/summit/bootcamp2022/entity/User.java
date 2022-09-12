@@ -29,7 +29,7 @@ import java.util.UUID;
 public class User implements UserDetails, Serializable {
 
     @Id
-    private UUID id;
+    private String id;
     @Column(name = "nome")
     private String username;
 
