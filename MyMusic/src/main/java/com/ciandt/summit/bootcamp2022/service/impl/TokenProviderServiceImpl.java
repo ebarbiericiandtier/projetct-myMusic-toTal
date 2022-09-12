@@ -8,6 +8,8 @@ import com.ciandt.summit.bootcamp2022.exception.UserNotFoundException;
 import com.ciandt.summit.bootcamp2022.service.TokenProviderService;
 import com.ciandt.summit.bootcamp2022.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class TokenProviderServiceImpl implements TokenProviderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenProviderServiceImpl.class);
 
     private final UserService userService;
     @Value("${token.provider.url}")
@@ -24,6 +28,7 @@ public class TokenProviderServiceImpl implements TokenProviderService {
     public String getToken(String username) {
 
         if (!userService.findByUsername(username).isPresent()){
+            logger.error("User was not found");
             throw new UserNotFoundException();
         }
 

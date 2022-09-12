@@ -9,6 +9,8 @@ import com.ciandt.summit.bootcamp2022.service.MusicService;
 import com.ciandt.summit.bootcamp2022.service.mapper.MusicDTOMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,6 +29,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MusicServiceImpl implements MusicService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MusicServiceImpl.class);
+
     private final MusicRepository musicRepository;
     @Autowired
     @Setter
@@ -44,18 +48,24 @@ public class MusicServiceImpl implements MusicService {
 
         Slice<Music> musicSet = musicRepository.findAllWithFilter(filter, pageable);
 
-        if (musicSet.isEmpty())
+        if (musicSet.isEmpty()) {
+            logger.info("Music not found");
             throw new MusicNotFound();
 
 //       return musicDTOMapper.toSetOfDTO(musicSet);
         return musicSet;
+        logger.info("Musics returned successfully");
+        return musicDTOMapper.toSetOfDTO(musicSet);
     }
 
     @Override
     public Music findById(String id) {
         return musicRepository
                 .findById(id)
-                .orElseThrow(InvalidMusicException::new);
+                .orElseThrow(() -> {
+            logger.error("Invalid music id");
+            return new InvalidMusicException();
+        });
     }
 
 }
