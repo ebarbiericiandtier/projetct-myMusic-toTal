@@ -89,9 +89,9 @@ data:
       scrape_interval: 5s
       evaluation_interval: 5s
     scrape_configs:
-      - job_name: 'prometheus-monitoring'
-        metrics_path: '/actuator/prometheus' 
-        scheme: 'http'
+      - job_name: prometheus-monitoring
+        metrics_path: /actuator/prometheus 
+        scheme: http
         static_configs:
         - targets: ['http://token-provider:8081/', 'http://my-music:8080']
 ---
@@ -110,8 +110,8 @@ spec:
         - name: prometheus
           image: prom/prometheus:latest
           args:
-            - "--config.file=/etc/prometheus/prometheus.yml"
-            - "--storage.tsdb.path=/prometheus/"
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus/'
           ports:
             - containerPort: 9090
           volumeMounts:
@@ -133,13 +133,13 @@ kind: Service
 metadata:
   name: prometheus
   annotations:
-    dev.okteto.com/auto-ingress: "true"
-    prometheus.io/scrape: "true"
-    prometheus.io/port:   "9090"
+    dev.okteto.com/auto-ingress: true
+    prometheus.io/scrape: true
+    prometheus.io/port: 9090
 spec:
   type: ClusterIP  
   ports:
-  - name: "prometheus"
+  - name: prometheus
     port: 9090
   selector:
     app: prometheus
