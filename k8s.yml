@@ -16,6 +16,15 @@ spec:
         - name: token-provider
           image: jfrhudson/token-provider:2.0
           imagePullPolicy: IfNotPresent
+          env:
+            - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
+              value: true
+            - name: MANAGEMENT_ENDPOINT_WEB_EXPOSURE_INCLUDE
+              value: *
+            - name: MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED
+              value: true
+            - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: true
           ports:
             - containerPort: 8080
 ---
@@ -57,6 +66,14 @@ spec:
           env:
             - name: TOKEN_PROVIDER_URL
               value: http://token-provider:8081/
+            - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
+              value: true
+            - name: MANAGEMENT_ENDPOINT_WEB_EXPOSURE_INCLUDE
+              value: *
+            - name: MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED
+              value: true
+            - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: true
           ports:
             - containerPort: 8080
 ---
