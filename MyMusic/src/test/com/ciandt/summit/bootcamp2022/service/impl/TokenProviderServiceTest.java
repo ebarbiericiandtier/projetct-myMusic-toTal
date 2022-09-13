@@ -47,7 +47,7 @@ public class TokenProviderServiceTest {
     @Test
     public void testTheFlow(){
         try {
-            this.mock.perform(MockMvcRequestBuilders.post("localhost:8080/auth/login")
+            this.mock.perform(MockMvcRequestBuilders.post("http://localhost:8080/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{ 'username': 'joao'}"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
