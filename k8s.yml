@@ -133,9 +133,9 @@ kind: Service
 metadata:
   name: prometheus
   annotations:
-    dev.okteto.com/auto-ingress: true
-    prometheus.io/scrape: true
-    prometheus.io/port: 9090
+    dev.okteto.com/auto-ingress: "true"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
 spec:
   type: ClusterIP  
   ports:
