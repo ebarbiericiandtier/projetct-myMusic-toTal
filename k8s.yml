@@ -192,9 +192,6 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-storage
-            - mountPath: /etc/grafana/provisioning/datasources
-              name: grafana-datasources
-              readOnly: false
       volumes:
         - name: grafana-storage
           emptyDir: {}
