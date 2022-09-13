@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User findById(String id){
+    public User findById(UUID id){
 
         return userRepository
                 .findById(id)
