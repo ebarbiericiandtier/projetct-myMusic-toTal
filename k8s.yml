@@ -15,7 +15,7 @@ spec:
       containers:
         - name: token-provider
           image: jfrhudson/token-provider:2.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
               value: "true"
@@ -86,11 +86,11 @@ metadata:
   namespace: jefferson023
 spec:
   ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
   selector:
-      app: my-music
+    app: my-music
   sessionAffinity: None
   type: LoadBalancer
 ---
@@ -116,18 +116,6 @@ data:
         scheme: http
         static_configs:
         - targets: ['token-provider:8081']
-      - job_name: 'kubernetes-service-endpoints'
-        kubernetes_sd_configs:
-        - role: endpoints
-        relabel_configs:
-        - action: labelmap
-          regex: __meta_kubernetes_service_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_service_name]
-          action: replace
-          target_label: kubernetes_name
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -161,10 +149,10 @@ spec:
           configMap:
             defaultMode: 420
             name: prometheus-server-conf
-  
+
         - name: prometheus-storage-volume
           emptyDir: {}
---- 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -177,44 +165,12 @@ metadata:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9090"
 spec:
-  type: ClusterIP  
+  type: ClusterIP
   ports:
-  - name: prometheus
-    port: 9090
+    - name: prometheus
+      port: 9090
   selector:
     app: prometheus
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: prometheus
-rules:
-  - apiGroups: [""]
-    resources:
-      - nodes
-      - nodes/proxy
-      - services
-      - endpoints
-      - pods
-    verbs: ["get", "list", "watch"]
-  - apiGroups:
-      - extensions
-    verbs: ["get", "list", "watch"]
-  - nonResourceURLs: ["/metrics"]
-    verbs: ["get"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: prometheus
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: prometheus
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: jefferson023
 ---
 apiVersion: apps/v1
 kind: Deployment
