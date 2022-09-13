@@ -93,7 +93,7 @@ data:
         metrics_path: /actuator/prometheus 
         scheme: http
         static_configs:
-        - targets: ['http://token-provider:8081/', 'http://my-music:8080']
+        - targets: ['http://token-provider:8081', 'http://my-music:8080']
 ---
 apiVersion: apps/v1
 kind: Deployment
