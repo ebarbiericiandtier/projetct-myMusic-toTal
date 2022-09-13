@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: token-provider
-          image: jfrhudson/token-provider:latest
+          image: jfrhudson/token-provider:2.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
         - name: my-music
-          image: jfrhudson/my-music:latest
+          image: jfrhudson/my-music:1.0
           imagePullPolicy: Always
           env:
             - name: TOKEN_PROVIDER_URL
