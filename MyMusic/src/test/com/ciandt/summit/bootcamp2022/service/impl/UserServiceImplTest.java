@@ -1,9 +1,8 @@
-package java.com.ciandt.summit.bootcamp2022.service.impl;
+package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.entity.User;
 import com.ciandt.summit.bootcamp2022.enums.Role;
 import com.ciandt.summit.bootcamp2022.repository.UserRepository;
-import com.ciandt.summit.bootcamp2022.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
