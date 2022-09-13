@@ -184,42 +184,37 @@ spec:
   selector:
     app: prometheus
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: prometheus-account
+  name: prometheus
 rules:
   - apiGroups: [""]
     resources:
       - nodes
+      - nodes/proxy
       - services
       - endpoints
       - pods
     verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources:
-      - configmaps
-    verbs: ["get"]
+  - apiGroups:
+      - extensions
+    verbs: ["get", "list", "watch"]
   - nonResourceURLs: ["/metrics"]
     verbs: ["get"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: prometheus-account
+  name: prometheus
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: prometheus-account
+  name: prometheus
 subjects:
   - kind: ServiceAccount
-    name: prometheus-account
-    namespace: default
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: prometheus-account
+    name: default
+    namespace: jefferson023
 ---
 apiVersion: apps/v1
 kind: Deployment
