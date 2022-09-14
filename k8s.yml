@@ -222,6 +222,12 @@ kind: ClusterRole
 metadata:
   name: prometheus2
 rules:
+  - apiGroups: [ "rbac.authorization.k8s.io" ]
+    resources: [ "rolebindings" ]
+    verbs: [ "get", "list", "watch", "create", "update", "patch", "delete" ]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: [""]
     resources:
       - nodes
