@@ -4,6 +4,8 @@ import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.entity.Artist;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
+import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
+import com.ciandt.summit.bootcamp2022.exception.PlaylistNotFoundException;
 import com.ciandt.summit.bootcamp2022.repository.MusicRepository;
 import com.ciandt.summit.bootcamp2022.repository.PlaylistRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +47,10 @@ class PlaylistServiceImplTest {
 
     @Test
     void findById() {
+        Playlist playlist = new Playlist();
+        playlist.setId(generateStringUUID());
+        when(playlistRepository.findById(playlist.getId())).thenReturn(Optional.of(playlist));
+        assertEquals(playlist,playlistService.findById(playlist.getId()));
     }
 
     @Test
@@ -82,6 +88,52 @@ class PlaylistServiceImplTest {
         assertFalse(playlistAfterRemove.getMusics().contains(music1));
         assertTrue(playlistAfterRemove.getMusics().containsAll(Arrays.asList(music2, music3)));
 
+    }
+
+    @Test
+    void removeMusicFromInvalidPlaylistThrowsException() {
+
+        Artist artist = new Artist();
+        artist.setId(generateStringUUID());
+        artist.setName("Rihanna");
+
+        Music music1 = buildMusicEntity("Umbrella", artist);
+
+        MusicDTO music1DTO = new MusicDTO();
+        music1DTO.setId(music1.getId());
+
+        assertThrows(PlaylistNotFoundException.class, () -> playlistService.removeMusicFromPlaylist("123", music1DTO));
+
+    }
+
+    @Test
+    void removeInvalidMusicFromPlaylistThrowsException() {
+
+        Artist artist = new Artist();
+        artist.setId(generateStringUUID());
+        artist.setName("Rihanna");
+
+        Music music2 = buildMusicEntity("Work", artist);
+        Music music3 = buildMusicEntity("Diamonds", artist);
+
+        Playlist playlist1 = new Playlist();
+        playlist1.setId(generateStringUUID());
+
+        Set<Music> musics = new HashSet<>(Arrays.asList(music2, music3));
+        playlist1.setMusics(musics);
+
+        when(playlistRepository.findAll()).thenReturn(Collections.singletonList(playlist1));
+        when(playlistRepository.findById(anyString())).thenReturn(Optional.of(playlist1));
+
+
+        when(playlistRepository.save(playlist1)).thenReturn(playlist1);
+        when(musicRepository.findById(music2.getId())).thenReturn(Optional.of(music2));
+        when(musicRepository.findById(music3.getId())).thenReturn(Optional.of(music3));
+
+        MusicDTO music1DTO = new MusicDTO();
+        music1DTO.setId("122");
+
+        assertThrows(InvalidMusicException.class, () -> playlistService.removeMusicFromPlaylist(playlist1.getId(), music1DTO));
     }
 
     private Music buildMusicEntity(String name, Artist a){
