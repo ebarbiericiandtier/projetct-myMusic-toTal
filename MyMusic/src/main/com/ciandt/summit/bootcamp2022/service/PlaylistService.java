@@ -9,4 +9,6 @@ public interface PlaylistService {
     Playlist removeMusicFromPlaylist(String playlistId, MusicDTO music);
 
     Playlist findById(String id);
+
+    Playlist findByUser();
 }
