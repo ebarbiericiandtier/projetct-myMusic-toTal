@@ -1,6 +1,7 @@
 package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
+import com.ciandt.summit.bootcamp2022.dto.PlaylistDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
 import com.ciandt.summit.bootcamp2022.entity.User;
@@ -54,7 +55,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Transactional
-    public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
+    public PlaylistDTO addMusicToPlaylist(String id, MusicDTO musicDTO){
 
         final Music music = musicService.findById(musicDTO.getId())
                 .orElseThrow(InvalidMusicException::new);
@@ -80,12 +81,13 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         playlist.getMusics().add(music);
         logger.info("Music added to playlist successfully");
-        return playlistRepository.save(playlist);
+        playlistRepository.save(playlist);
+        return playlistDTOMapper.toDto(playlist);
 
     }
 
     @Transactional
-    public Playlist removeMusicFromPlaylist(String id, MusicDTO musicDTO){
+    public PlaylistDTO removeMusicFromPlaylist(String id, MusicDTO musicDTO){
 
         final Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(PlaylistNotFoundException::new);
@@ -102,7 +104,8 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         logger.info("Music removed to playlist successfully");
         playlist.getMusics().remove(music);
-        return playlistRepository.save(playlist);
+        playlistRepository.save(playlist);
+        return playlistDTOMapper.toDto(playlist);
     }
 
     public boolean playlistContainsMusic(Playlist playlist, Music m){
@@ -120,7 +123,6 @@ public class PlaylistServiceImpl implements PlaylistService {
         if (!u.getPlaylist().getId().equals(playlistIdParam)){
             throw new CannotModifyPlaylistException();
         }
-
     }
 
 }

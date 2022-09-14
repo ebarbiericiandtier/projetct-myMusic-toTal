@@ -18,8 +18,7 @@ public interface PlaylistDTOMapper {
 
     PlaylistDTO toDto(Playlist playlist);
 
-    Set<PlaylistDTO> toSetOfDTO(Set<PlaylistDTO> playlistDTO);
-
     Playlist toEntity(PlaylistDTO dto);
 
+    Playlist toSetOfEntity(PlaylistDTO dto);
 }

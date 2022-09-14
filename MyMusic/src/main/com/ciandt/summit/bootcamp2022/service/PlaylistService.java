@@ -4,9 +4,9 @@ import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
 
 public interface PlaylistService {
-    Playlist addMusicToPlaylist(String id, MusicDTO musicDTO);
+    PlaylistDTO addMusicToPlaylist(String id, MusicDTO musicDTO);
 
-    Playlist removeMusicFromPlaylist(String playlistId, MusicDTO music);
+    PlaylistDTO removeMusicFromPlaylist(String playlistId, MusicDTO music);
 
     Playlist findById(String id);
 
