@@ -1,15 +1,21 @@
 package com.ciandt.summit.bootcamp2022.service.mapper;
 
-import com.ciandt.summit.bootcamp2022.dto.UserDto;
+
+import com.ciandt.summit.bootcamp2022.dto.UserDTO;
 import com.ciandt.summit.bootcamp2022.entity.User;
+import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel              = "spring",
-        uses                        = { UserDTOMapper.class }
+        uses                        = { UserDTOMapper.class },
+        collectionMappingStrategy   = CollectionMappingStrategy.TARGET_IMMUTABLE
 )
 public interface UserDTOMapper {
 
-    UserDto toDto(User user);
+    UserDTOMapper INSTANCE = Mappers.getMapper(UserDTOMapper.class);
 
-    User toEntity(UserDto dto);
+    UserDTO toDto(User user);
+
+    User toEntity(UserDTO userDTO);
 }
