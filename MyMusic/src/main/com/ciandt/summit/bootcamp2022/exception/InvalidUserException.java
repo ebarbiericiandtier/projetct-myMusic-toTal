@@ -5,5 +5,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
         value = HttpStatus.BAD_REQUEST,
-        reason = "Invalid user id")
+        reason = "User not found")
 public class InvalidUserException extends RuntimeException {}

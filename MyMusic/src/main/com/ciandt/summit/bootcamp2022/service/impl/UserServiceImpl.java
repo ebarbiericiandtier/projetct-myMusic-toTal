@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> {
-                    logger.error("Invalid user id");
+                    logger.error("User not found");
                     return new InvalidUserException();
                 });
     }
