@@ -35,8 +35,6 @@ public class PlaylistBuilder {
                 .build();
     }
 
-
-
     private String idGenerator(String source){
         return UUID.nameUUIDFromBytes(
                         source.getBytes())

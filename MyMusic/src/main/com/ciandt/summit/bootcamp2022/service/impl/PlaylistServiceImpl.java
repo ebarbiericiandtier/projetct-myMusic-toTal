@@ -112,12 +112,12 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlist.getMusics().contains(m);
     }
 
-    private boolean isPremiumAccount(){
+    public boolean isPremiumAccount(){
         User u  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return u.getRole().equals(Role.PREMIUM);
     }
 
-    private void validatePlaylistOwner(String playlistIdParam){
+    public void validatePlaylistOwner(String playlistIdParam){
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!u.getPlaylist().getId().equals(playlistIdParam)){
