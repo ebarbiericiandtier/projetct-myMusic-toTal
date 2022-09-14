@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +20,7 @@ import javax.validation.constraints.NotNull;
 public class UserDTO {
 
     @Schema(name = "id", description = "Unique user identifier")
-    private String id;
+    private UUID id;
 
     @Schema(name = "username", description = "user's name", required = true)
     @NotBlank
