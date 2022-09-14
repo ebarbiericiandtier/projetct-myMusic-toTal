@@ -4,6 +4,7 @@ import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
 import com.ciandt.summit.bootcamp2022.entity.User;
+import com.ciandt.summit.bootcamp2022.enums.Role;
 import com.ciandt.summit.bootcamp2022.exception.CannotModifyPlaylistException;
 import com.ciandt.summit.bootcamp2022.exception.FreeAccountLimitException;
 import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
@@ -12,14 +13,12 @@ import com.ciandt.summit.bootcamp2022.exception.PlaylistNotFoundException;
 import com.ciandt.summit.bootcamp2022.repository.PlaylistRepository;
 import com.ciandt.summit.bootcamp2022.service.MusicService;
 import com.ciandt.summit.bootcamp2022.service.PlaylistService;
-import com.ciandt.summit.bootcamp2022.service.UserService;
 import com.ciandt.summit.bootcamp2022.service.mapper.PlaylistDTOMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -56,9 +55,9 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
-        validatePlaylistOwner(id);
 
-        final Music music = musicService.findById(musicDTO.getId());
+        final Music music = musicService.findById(musicDTO.getId())
+                .orElseThrow(InvalidMusicException::new);
 
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> {
@@ -66,11 +65,13 @@ public class PlaylistServiceImpl implements PlaylistService {
                     return new PlaylistNotFoundException();
                 });
 
+        validatePlaylistOwner(id);
+
         if (playlistContainsMusic(playlist, music)) {
             throw new NotModified();
         }
 
-        final int MAX_MUSIC_FREE_USER = 4;
+        final int MAX_MUSIC_FREE_USER = 5;
 
         if (!isPremiumAccount() &&
                 playlist.getMusics().size() == MAX_MUSIC_FREE_USER) {
@@ -86,18 +87,22 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Transactional
     public Playlist removeMusicFromPlaylist(String id, MusicDTO musicDTO){
 
-        final Playlist playlistFound = playlistRepository.findById(id)
+        final Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(PlaylistNotFoundException::new);
 
-        final Music musicInPlaylist = playlistFound.getMusicById(musicDTO.getId())
-                .orElseThrow(() -> {
-                    logger.error("Invalid music id");
-                    return new InvalidMusicException();
-                });
+        validatePlaylistOwner(id);
+
+        final Music music = musicService.findById(musicDTO.getId())
+                .orElseThrow(InvalidMusicException::new);
+
+        if (!playlistContainsMusic(playlist, music)) {
+            logger.error("Song doesnot exists in playlist");
+            throw new NotModified();
+        }
 
         logger.info("Music removed to playlist successfully");
-        playlistFound.getMusics().remove(musicInPlaylist);
-        return playlistRepository.save(playlistFound);
+        playlist.getMusics().remove(music);
+        return playlistRepository.save(playlist);
     }
 
     public boolean playlistContainsMusic(Playlist playlist, Music m){
@@ -105,12 +110,13 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     private boolean isPremiumAccount(){
-        return SecurityContextHolder.getContext().getAuthentication()
-                .getAuthorities().contains("PREMIUM");
+        User u  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return u.getRole().equals(Role.PREMIUM);
     }
 
     private void validatePlaylistOwner(String playlistIdParam){
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         if (!u.getPlaylist().getId().equals(playlistIdParam)){
             throw new CannotModifyPlaylistException();
         }

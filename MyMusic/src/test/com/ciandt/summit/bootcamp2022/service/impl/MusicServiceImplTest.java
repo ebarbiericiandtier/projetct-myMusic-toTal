@@ -18,11 +18,14 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,26 +97,27 @@ class MusicServiceImplTest {
         music.addAll(buildEntitySet("Paralamas", "do Sucesso"));
         music.addAll(buildEntitySet("Anitta", "com Sucesso"));
 
-        given(musicRepository.findAllWithFilter(anyString(), any()))
-                .willReturn(music);
+        Slice rst = new SliceImpl<Music>(music.stream().collect(Collectors.toList()));
 
-        Set<MusicDTO> setAtual = musicService.findAllWithFilter(filter);
+        given(musicRepository.findAllWithFilter(anyString(), any()))
+                .willReturn(rst);
+
+        Slice<Music> setAtual = musicService.findAllWithFilter(filter, 1, 10);
 
         Set<MusicDTO> setEsperado = INSTANCE.toSetOfDTO(music);
 
-        assertEquals(setEsperado.size(), setAtual.size());
-        assertEquals(setEsperado, setAtual);
+        assertEquals(setEsperado.size(), setAtual.getSize());
     }
 
     @Test
     void whenNotFindAllWithFilterByName() {
 
         given(musicRepository.findAllWithFilter(anyString(), any()))
-                .willReturn(Collections.emptySet());
+                .willReturn(new SliceImpl<Music>(Collections.emptyList()));
 
         MusicNotFound thrown = assertThrows(
                 MusicNotFound.class,
-                () -> musicService.findAllWithFilter("ada"),
+                () -> musicService.findAllWithFilter("ada", 1, 5),
                 "Exception not found"
         );
 

@@ -18,12 +18,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -56,13 +53,9 @@ public class MusicServiceImpl implements MusicService {
     }
 
     @Override
-    public Music findById(String id) {
+    public Optional<Music> findById(String id) {
         return musicRepository
-                .findById(id)
-                .orElseThrow(() -> {
-                    logger.error("Invalid music id");
-                    return new InvalidMusicException();
-                });
+                .findById(id);
     }
 
 }

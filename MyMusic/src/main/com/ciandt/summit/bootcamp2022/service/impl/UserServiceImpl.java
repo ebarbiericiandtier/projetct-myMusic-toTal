@@ -8,6 +8,7 @@ import com.ciandt.summit.bootcamp2022.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,5 +26,10 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         user.setPlaylist(playlistRepository.save(new Playlist()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
