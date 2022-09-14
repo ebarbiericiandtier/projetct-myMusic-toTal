@@ -117,17 +117,6 @@ data:
         static_configs:
         - targets: ['token-provider:8081']
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: prometheus-storage-volume-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 256Mi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -164,8 +153,6 @@ spec:
 
         - name: prometheus-storage-volume
           emptyDir: {}
-          persistentVolumeClaim:
-            claimName: prometheus-storage-volume-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -185,17 +172,6 @@ spec:
       port: 9090
   selector:
     app: prometheus
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-storage-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 256Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -226,8 +202,6 @@ spec:
       volumes:
         - name: grafana-storage
           emptyDir: {}
-          persistentVolumeClaim:
-            claimName: grafana-storage-pvc
 ---
 apiVersion: v1
 kind: Service
