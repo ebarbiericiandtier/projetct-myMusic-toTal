@@ -389,7 +389,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-deployment
-  namespace: monitoring
+  namespace: jefferson023
   labels:
     app: prometheus-server
 spec:
@@ -428,7 +428,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-service
-  namespace: monitoring
+  namespace: jefferson023
   annotations:
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '9090'
