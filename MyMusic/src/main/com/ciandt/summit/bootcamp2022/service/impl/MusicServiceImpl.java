@@ -12,9 +12,17 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -28,20 +36,23 @@ public class MusicServiceImpl implements MusicService {
     @Setter
     private MusicDTOMapper musicDTOMapper;
 
-    public Set<MusicDTO> findAllWithFilter(String filter) {
+    public Slice<Music> findAllWithFilter(String filter, int page, int size) {
 
         Sort sort = Sort.by("artist.name").ascending()
                 .and(Sort.by("name").ascending());
 
-        Set<Music> musicSet = musicRepository.findAllWithFilter(filter, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Slice<Music> musicSet = musicRepository.findAllWithFilter(filter, pageable);
 
         if (musicSet.isEmpty()) {
             logger.info("Music not found");
             throw new MusicNotFound();
         }
 
+//       return musicDTOMapper.toSetOfDTO(musicSet);
         logger.info("Musics returned successfully");
-        return musicDTOMapper.toSetOfDTO(musicSet);
+        return musicSet;
     }
 
     @Override
@@ -49,9 +60,9 @@ public class MusicServiceImpl implements MusicService {
         return musicRepository
                 .findById(id)
                 .orElseThrow(() -> {
-            logger.error("Invalid music id");
-            return new InvalidMusicException();
-        });
+                    logger.error("Invalid music id");
+                    return new InvalidMusicException();
+                });
     }
 
 }
