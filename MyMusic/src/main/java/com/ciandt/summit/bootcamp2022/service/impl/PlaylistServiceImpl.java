@@ -3,6 +3,8 @@ package com.ciandt.summit.bootcamp2022.service.impl;
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
+import com.ciandt.summit.bootcamp2022.entity.User;
+import com.ciandt.summit.bootcamp2022.exception.CannotModifyPlaylistException;
 import com.ciandt.summit.bootcamp2022.exception.FreeAccountLimitException;
 import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
 import com.ciandt.summit.bootcamp2022.exception.NotModified;
@@ -16,7 +18,7 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +48,8 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Transactional
     public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final int MAX_MUSIC_FREE_USER = 5;
+        validatePlaylistOwner(id);
+
         final Music music = musicService.findById(musicDTO.getId());
 
         Playlist playlist = playlistRepository.findById(id)
@@ -60,8 +62,10 @@ public class PlaylistServiceImpl implements PlaylistService {
             throw new NotModified();
         }
 
-        if (playlist.getMusics().size() == MAX_MUSIC_FREE_USER
-                && authentication.getAuthorities().contains("PREMIUM")) {
+        final int MAX_MUSIC_FREE_USER = 4;
+
+        if (!isPremiumAccount() &&
+                playlist.getMusics().size() == MAX_MUSIC_FREE_USER) {
             throw new FreeAccountLimitException();
         }
 
@@ -90,6 +94,19 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     public boolean playlistContainsMusic(Playlist playlist, Music m){
         return playlist.getMusics().contains(m);
+    }
+
+    private boolean isPremiumAccount(){
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains("PREMIUM");
+    }
+
+    private void validatePlaylistOwner(String playlistIdParam){
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!u.getPlaylist().getId().equals(playlistIdParam)){
+            throw new CannotModifyPlaylistException();
+        }
+
     }
 
 }
