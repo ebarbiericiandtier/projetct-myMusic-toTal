@@ -1,6 +1,6 @@
 package com.ciandt.summit.bootcamp2022.controller;
 
-import com.ciandt.summit.bootcamp2022.dto.UserDto;
+import com.ciandt.summit.bootcamp2022.dto.UserDTO;
 import com.ciandt.summit.bootcamp2022.entity.User;
 import com.ciandt.summit.bootcamp2022.service.UserService;
 import com.ciandt.summit.bootcamp2022.service.mapper.UserDTOMapper;
@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("user")
@@ -27,9 +29,10 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+
     private final UserDTOMapper userDTOMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Operation(summary = "Saves a new user in database")
     @ApiResponses(value = {
@@ -37,16 +40,25 @@ public class UserController {
                     content = @Content),
     })
     @PostMapping
-    ResponseEntity<?> saveUser(@Valid @RequestBody UserDto userDto){
+    ResponseEntity<?> saveUser(@Valid @RequestBody UserDTO userDto) {
         logger.info("Receive request for creation of user {}", userDto);
         final User user = userDTOMapper.toEntity(userDto);
         final String id = String.valueOf(userService.save(user).getId());
         return ResponseEntity.created(ServletUriComponentsBuilder
-                                .fromCurrentRequest()
-                                .path("/{id}")
-                                .buildAndExpand(id)
-                                .toUri())
-                                .build();
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(id)
+                        .toUri())
+                .build();
+    }
+
+    @GetMapping("/{userId}")
+    ResponseEntity<UserDTO> findById(@PathVariable("userId") UUID id){
+        UserDTO userDTO =
+                userDTOMapper.toDto(userService.findById(id));
+        return ResponseEntity.ok(
+                userDTO
+        );
     }
 
     @GetMapping("/users")
