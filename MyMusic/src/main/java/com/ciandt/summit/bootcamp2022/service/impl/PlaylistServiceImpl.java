@@ -1,6 +1,7 @@
 package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
+import com.ciandt.summit.bootcamp2022.dto.PlaylistDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
 import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
@@ -41,7 +42,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Transactional
-    public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
+    public PlaylistDTO addMusicToPlaylist(String id, MusicDTO musicDTO){
 
         Music music = musicService.findById(musicDTO.getId());
 
@@ -53,12 +54,13 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         logger.info("Music added to playlist successfully");
         playlist.getMusics().add(music);
-        return playlistRepository.save(playlist);
+        playlistRepository.save(playlist);
+        return playlistDTOMapper.toDto(playlist);
 
     }
 
     @Transactional
-    public Playlist removeMusicFromPlaylist(String id, MusicDTO musicDTO){
+    public PlaylistDTO removeMusicFromPlaylist(String id, MusicDTO musicDTO){
 
         final Playlist playlistFound = playlistRepository.findById(id)
                 .orElseThrow(PlaylistNotFoundException::new);
@@ -71,7 +73,8 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         logger.info("Music removed to playlist successfully");
         playlistFound.getMusics().remove(musicInPlaylist);
-        return playlistRepository.save(playlistFound);
+        playlistRepository.save(playlistFound);
+        return playlistDTOMapper.toDto(playlistFound);
     }
 
 }

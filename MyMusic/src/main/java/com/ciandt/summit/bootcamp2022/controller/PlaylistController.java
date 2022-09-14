@@ -40,9 +40,9 @@ public class PlaylistController {
     }
 
     @PostMapping("/{playlistId}/musicas")
-    ResponseEntity<Playlist> addMusicToPlaylist(
+    ResponseEntity<PlaylistDTO> addMusicToPlaylist(
             @PathVariable("playlistId") String playlistId,
-            @Valid @RequestBody MusicDTO music){
+            @RequestBody MusicDTO music){
         return ResponseEntity.ok(
                 playlistService.addMusicToPlaylist(playlistId, music));
     }
@@ -55,17 +55,15 @@ public class PlaylistController {
     })
     @DeleteMapping("/{playlistId}/musicas")
     ResponseEntity<PlaylistDTO> removeMusicFromPlaylist(
-            @PathVariable("playlistId") String playlistId,
-            @Valid @RequestBody MusicDTO musicDTO){
+            @PathVariable String playlistId,
+            @RequestBody MusicDTO musicDTO){
 
-        Playlist playlist =
+        PlaylistDTO playlist =
                 playlistService.removeMusicFromPlaylist(playlistId, musicDTO);
 
         return ResponseEntity.ok(
-                playlistDTOMapper.toDto(playlist)
+                playlist
         );
     }
-
-
 
 }
