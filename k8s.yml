@@ -153,6 +153,8 @@ spec:
 
         - name: prometheus-storage-volume
           emptyDir: {}
+          persistentVolumeClaim:
+            claimName: prometheus-storage-volume-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -202,6 +204,8 @@ spec:
       volumes:
         - name: grafana-storage
           emptyDir: {}
+          persistentVolumeClaim:
+            claimName: grafana-storage-pvc
 ---
 apiVersion: v1
 kind: Service
