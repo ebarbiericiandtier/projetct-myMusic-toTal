@@ -14,8 +14,17 @@ spec:
     spec:
       containers:
         - name: token-provider
-          image: jfrhudson/token-provider:1.0
+          image: jfrhudson/token-provider:2.0
           imagePullPolicy: IfNotPresent
+          env:
+            - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
+              value: "true"
+            - name: MANAGEMENT_ENDPOINT_WEB_EXPOSURE_INCLUDE
+              value: "*"
+            - name: MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED
+              value: "true"
+            - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: "true"
           ports:
             - containerPort: 8080
 ---
@@ -56,7 +65,15 @@ spec:
           imagePullPolicy: Always
           env:
             - name: TOKEN_PROVIDER_URL
-              value: http://token-provider:8081/
+              value: "http://token-provider:8081/"
+            - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
+              value: "true"
+            - name: MANAGEMENT_ENDPOINT_WEB_EXPOSURE_INCLUDE
+              value: "*"
+            - name: MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED
+              value: "true"
+            - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: "true"
           ports:
             - containerPort: 8080
 ---
@@ -69,10 +86,135 @@ metadata:
   namespace: jefferson023
 spec:
   ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
   selector:
-      app: my-music
+    app: my-music
   sessionAffinity: None
   type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    scrape_configs:
+      - job_name: my-music-monitoring
+        metrics_path: /actuator/prometheus 
+        scheme: http
+        static_configs:
+        - targets: ['my-music:8080']
+      - job_name: token-provider-monitoring
+        metrics_path: /actuator/prometheus 
+        scheme: http
+        static_configs:
+        - targets: ['token-provider:8081']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus/'
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus/
+            - name: prometheus-storage-volume
+              mountPath: /prometheus/
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+
+        - name: prometheus-storage-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: jefferson023
+  labels:
+    app: prometheus
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  ports:
+    - name: prometheus
+      port: 9090
+  selector:
+    app: prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: jefferson023
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      name: grafana
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grafana
+              containerPort: 3000
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-storage
+      volumes:
+        - name: grafana-storage
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: jefferson023
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port:   '3000'
+spec:
+  selector:
+    app: grafana
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
