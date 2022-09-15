@@ -110,9 +110,11 @@ public class PlaylistServiceTest {
        when(musicService.findById(ArgumentMatchers.anyString()))
                .thenReturn(Optional.of(MusicDTOMapper.INSTANCE.toEntity(newSong)));
 
-       when(securityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(u);
+       when(securityContextHolder.getContext().getAuthentication().getPrincipal())
+               .thenReturn(u);
 
-       when(playlistRepository.findById(ArgumentMatchers.anyString())).thenReturn(Optional.of(initialPlaylist));
+       when(playlistRepository.findById(ArgumentMatchers.anyString()))
+               .thenReturn(Optional.of(initialPlaylist));
 
        PlaylistDTO actual = playlistService.addMusicToPlaylist(u.getPlaylist().getId(), newSong);
 

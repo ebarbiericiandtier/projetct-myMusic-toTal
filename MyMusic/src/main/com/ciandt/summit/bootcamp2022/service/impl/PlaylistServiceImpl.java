@@ -2,6 +2,7 @@ package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
 import com.ciandt.summit.bootcamp2022.dto.PlaylistDTO;
+import com.ciandt.summit.bootcamp2022.dto.UserDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
 import com.ciandt.summit.bootcamp2022.entity.User;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -37,6 +39,8 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Autowired
     @Setter
     private PlaylistDTOMapper playlistDTOMapper;
+
+    private static final Integer MAX_MUSIC_FREE_USER = 5;
 
     public Playlist findById(String id){
 
@@ -72,10 +76,9 @@ public class PlaylistServiceImpl implements PlaylistService {
             throw new NotModified();
         }
 
-        final int MAX_MUSIC_FREE_USER = 5;
 
         if (!isPremiumAccount() &&
-                playlist.getMusics().size() == MAX_MUSIC_FREE_USER) {
+                MAX_MUSIC_FREE_USER.equals(playlist.getMusics().size())) {
             throw new FreeAccountLimitException();
         }
 
@@ -113,16 +116,19 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     public boolean isPremiumAccount(){
-        User u  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return u.getRole().equals(Role.PREMIUM);
+        return getUserFromContext().getRole().equals(Role.PREMIUM);
     }
 
     public void validatePlaylistOwner(String playlistIdParam){
-        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User u = getUserFromContext();
 
         if (!u.getPlaylist().getId().equals(playlistIdParam)){
             throw new CannotModifyPlaylistException();
         }
+    }
+
+    private User getUserFromContext() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
