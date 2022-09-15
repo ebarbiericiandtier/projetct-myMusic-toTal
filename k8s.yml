@@ -15,7 +15,7 @@ spec:
       containers:
         - name: token-provider
           image: jfrhudson/token-provider:2.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: MANAGEMENT_ENDPOINT_METRICS_ENABLED
               value: "true"

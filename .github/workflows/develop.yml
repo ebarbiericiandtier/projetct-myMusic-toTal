@@ -2,7 +2,7 @@ name: develop pipeline
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "fix/BOOT-1402" ]
 
 jobs:
   test:
