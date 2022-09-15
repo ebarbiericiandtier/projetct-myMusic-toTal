@@ -17,4 +17,6 @@ public interface MusicDTOMapper {
 
     @Mapping(source = "artist", target = "artist")
     Set<MusicDTO> toSetOfDTO(Set<Music> music);
+
+    Music toEntity(MusicDTO build);
 }

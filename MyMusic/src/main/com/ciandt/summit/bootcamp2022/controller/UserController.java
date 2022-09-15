@@ -24,7 +24,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -59,5 +59,10 @@ public class UserController {
         return ResponseEntity.ok(
                 userDTO
         );
+    }
+
+    @GetMapping("/users")
+    ResponseEntity<?> findAll(){
+        return ResponseEntity.ok(userService.findAll());
     }
 }

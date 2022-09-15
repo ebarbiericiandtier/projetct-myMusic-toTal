@@ -2,6 +2,7 @@ package com.ciandt.summit.bootcamp2022.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @Schema(name = "Music", description = "Representation of a Music")
+@Builder
 public class MusicDTO {
     @Schema(description = "Unique value that represents a Music in database")
     @NotNull

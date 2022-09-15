@@ -1,9 +1,16 @@
 package com.ciandt.summit.bootcamp2022.service.impl;
 
 import com.ciandt.summit.bootcamp2022.dto.MusicDTO;
+import com.ciandt.summit.bootcamp2022.dto.PlaylistDTO;
+import com.ciandt.summit.bootcamp2022.dto.UserDTO;
 import com.ciandt.summit.bootcamp2022.entity.Music;
 import com.ciandt.summit.bootcamp2022.entity.Playlist;
+import com.ciandt.summit.bootcamp2022.entity.User;
+import com.ciandt.summit.bootcamp2022.enums.Role;
+import com.ciandt.summit.bootcamp2022.exception.CannotModifyPlaylistException;
+import com.ciandt.summit.bootcamp2022.exception.FreeAccountLimitException;
 import com.ciandt.summit.bootcamp2022.exception.InvalidMusicException;
+import com.ciandt.summit.bootcamp2022.exception.NotModified;
 import com.ciandt.summit.bootcamp2022.exception.PlaylistNotFoundException;
 import com.ciandt.summit.bootcamp2022.repository.PlaylistRepository;
 import com.ciandt.summit.bootcamp2022.service.MusicService;
@@ -14,6 +21,8 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,6 +40,8 @@ public class PlaylistServiceImpl implements PlaylistService {
     @Setter
     private PlaylistDTOMapper playlistDTOMapper;
 
+    private static final Integer MAX_MUSIC_FREE_USER = 5;
+
     public Playlist findById(String id){
 
         return playlistRepository.findById(id)
@@ -40,10 +51,18 @@ public class PlaylistServiceImpl implements PlaylistService {
                 });
     }
 
-    @Transactional
-    public Playlist addMusicToPlaylist(String id, MusicDTO musicDTO){
+    @Override
+    public Playlist findByUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return playlistRepository.findById(user.getPlaylist().getId())
+                .orElseThrow(PlaylistNotFoundException::new);
+    }
 
-        Music music = musicService.findById(musicDTO.getId());
+    @Transactional
+    public PlaylistDTO addMusicToPlaylist(String id, MusicDTO musicDTO){
+
+        final Music music = musicService.findById(musicDTO.getId())
+                .orElseThrow(InvalidMusicException::new);
 
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> {
@@ -51,27 +70,65 @@ public class PlaylistServiceImpl implements PlaylistService {
                     return new PlaylistNotFoundException();
                 });
 
-        logger.info("Music added to playlist successfully");
+        validatePlaylistOwner(id);
+
+        if (playlistContainsMusic(playlist, music)) {
+            throw new NotModified();
+        }
+
+
+        if (!isPremiumAccount() &&
+                MAX_MUSIC_FREE_USER.equals(playlist.getMusics().size())) {
+            throw new FreeAccountLimitException();
+        }
+
         playlist.getMusics().add(music);
-        return playlistRepository.save(playlist);
+        logger.info("Music added to playlist successfully");
+        playlistRepository.save(playlist);
+        return playlistDTOMapper.toDto(playlist);
 
     }
 
     @Transactional
-    public Playlist removeMusicFromPlaylist(String id, MusicDTO musicDTO){
+    public PlaylistDTO removeMusicFromPlaylist(String id, MusicDTO musicDTO){
 
-        final Playlist playlistFound = playlistRepository.findById(id)
+        final Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(PlaylistNotFoundException::new);
 
-        final Music musicInPlaylist = playlistFound.getMusicById(musicDTO.getId())
-                .orElseThrow(() -> {
-                    logger.error("Invalid music id");
-                    return new InvalidMusicException();
-                });
+        validatePlaylistOwner(id);
+
+        final Music music = musicService.findById(musicDTO.getId())
+                .orElseThrow(InvalidMusicException::new);
+
+        if (!playlistContainsMusic(playlist, music)) {
+            logger.error("Song doesnot exists in playlist");
+            throw new NotModified();
+        }
 
         logger.info("Music removed to playlist successfully");
-        playlistFound.getMusics().remove(musicInPlaylist);
-        return playlistRepository.save(playlistFound);
+        playlist.getMusics().remove(music);
+        playlistRepository.save(playlist);
+        return playlistDTOMapper.toDto(playlist);
+    }
+
+    public boolean playlistContainsMusic(Playlist playlist, Music m){
+        return playlist.getMusics().contains(m);
+    }
+
+    public boolean isPremiumAccount(){
+        return getUserFromContext().getRole().equals(Role.PREMIUM);
+    }
+
+    public void validatePlaylistOwner(String playlistIdParam){
+        User u = getUserFromContext();
+
+        if (!u.getPlaylist().getId().equals(playlistIdParam)){
+            throw new CannotModifyPlaylistException();
+        }
+    }
+
+    private User getUserFromContext() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
