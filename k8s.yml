@@ -62,7 +62,7 @@ spec:
       containers:
         - name: my-music
           image: jfrhudson/my-music:1.0
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: TOKEN_PROVIDER_URL
               value: "http://token-provider:8081/"
