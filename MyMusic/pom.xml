@@ -73,6 +73,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.pitest</groupId>
+			<artifactId>pitest-parent</artifactId>
+			<version>1.1.10</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.20</version>
@@ -162,6 +168,20 @@
 				</configuration>
 
 			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.1.10</version>
+				<configuration>
+					<targetClasses>
+						<param>com.baeldung.testing.mutation.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>com.baeldung.mutation.test.*</param>
+					</targetTests>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>
