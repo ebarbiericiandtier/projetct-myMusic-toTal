@@ -95,7 +95,6 @@ public class MusicServiceTest {
                 .andExpect(status().isOk());*/
     }
 
-    @Test
     public void searchForAMusic() throws Exception{
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("http://api/v1/musicas")

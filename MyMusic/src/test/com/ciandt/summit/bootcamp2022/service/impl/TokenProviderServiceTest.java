@@ -44,7 +44,6 @@ public class TokenProviderServiceTest {
         Assertions.assertThat(tokenProviderServiceImpl.getToken("maria")).isInstanceOf(String.class);
     }
 
-    @Test
     public void testTheFlow(){
         try {
             this.mock.perform(MockMvcRequestBuilders.post("http://localhost:8080/auth/login")
